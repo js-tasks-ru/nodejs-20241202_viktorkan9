@@ -36,9 +36,43 @@ export class TasksService {
     },
   ];
 
+  private filterByStatus(status: TaskStatus): Task[] {
+    return this.tasks.filter(task => task.status === status);
+  }
+
+  private _sortBy(tasks: Task[], field: keyof Task, order: 'asc' | 'desc' = 'asc'): Task[] {
+    return tasks.sort((a, b) => {
+      if (a[field] < b[field]) return order === 'asc' ? -1 : 1;
+      if (a[field] > b[field]) return order === 'asc' ? 1 : -1;
+
+      return 0;
+    });
+  }
+
+  private _paginate(tasks: Task[], page: number, limit: number): Task[] {
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+
+    return tasks.slice(startIndex, endIndex);
+  }
+
   getFilteredTasks(
     status?: TaskStatus,
-    page?: number,
-    limit?: number,
-  ): Task[] {}
+    page: number = 1,
+    limit: number = 10,
+    sortBy?: keyof Task,
+    sortOrder: 'asc' | 'desc' = 'asc'
+  ): Task[] {
+    let filteredTasks = [...this.tasks];
+
+    if (status) {
+      filteredTasks = this.filterByStatus(status);
+    }
+
+    if (sortBy) {
+      filteredTasks = this._sortBy(filteredTasks, sortBy, sortOrder);
+    }
+
+    return this._paginate(filteredTasks, page, limit);
+  }
 }
