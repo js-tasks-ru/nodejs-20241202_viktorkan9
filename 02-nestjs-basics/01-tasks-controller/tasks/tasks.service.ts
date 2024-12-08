@@ -10,7 +10,13 @@ export class TasksService {
   }
 
   getTaskById(id: string): Task {
-    return this.tasks.find(item => item.id === id)
+    const task = this.tasks.find(item => item.id === id)
+
+    if (!task) {
+      throw new NotFoundException(`Task with ID "${id}" not found`)
+    }
+
+    return task
   }
 
   createTask(task): Task {

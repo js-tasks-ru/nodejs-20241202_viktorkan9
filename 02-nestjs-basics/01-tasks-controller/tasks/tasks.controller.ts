@@ -8,7 +8,7 @@ import {
   Post,
 } from "@nestjs/common";
 import { TasksService } from "./tasks.service";
-import { Task } from "./task.model";
+import { CreateTaskDto } from "./dto/CreateTask.dto";
 
 @Controller("tasks")
 export class TasksController {
@@ -25,12 +25,12 @@ export class TasksController {
   }
 
   @Post()
-  createTask(@Body() task: Task) {
+  createTask(@Body() task: CreateTaskDto) {
     return this.tasksService.createTask(task);
   }
 
   @Patch(":id")
-  updateTask(@Param("id") id: string, @Body() task: Task) {
+  updateTask(@Param("id") id: string, @Body() task: CreateTaskDto) {
     return this.tasksService.updateTask(id, task);
   }
 
