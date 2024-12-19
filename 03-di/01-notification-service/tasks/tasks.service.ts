@@ -3,6 +3,8 @@ import { CreateTaskDto, Task, TaskStatus, UpdateTaskDto } from "./task.model";
 import { NotificationService } from "../providers/NotificationService";
 import { UsersService } from "../users/users.service";
 
+const NEW_TASK_LABEL = 'Новая задача';
+
 @Injectable()
 export class TasksService {
   private tasks: Task[] = [];
@@ -11,6 +13,14 @@ export class TasksService {
     private readonly usersService: UsersService,
     private readonly notificationService: NotificationService,
   ) {}
+
+  private _getEmailMessage(task: Task) {
+    return {subject: 'Новая задача', message: `Вы назначены ответственным за задачу: "${task.title}"`};
+  }
+
+  private _getSMSMessage(task: Task, status: string) {
+    return `Статус задачи "${task.title}" обновлён на "${status}"`;
+  }
 
   async createTask(createTaskDto: CreateTaskDto) {
     const { title, description, assignedTo } = createTaskDto;
@@ -26,7 +36,10 @@ export class TasksService {
     };
 
     this.tasks.push(task);
-    this.notificationService.sendEmail(user.email, 'Новая задача', `Вы назначены ответственным за задачу: "${title}"`);
+
+    const { subject, message } = this._getEmailMessage(task);
+
+    this.notificationService.sendEmail(user.email, subject, message);
 
     return task;
   }
@@ -41,7 +54,8 @@ export class TasksService {
 
     Object.assign(task, updateTaskDto);
 
-    this.notificationService.sendSMS(user.phone, `Статус задачи "${task.title}" обновлён на "${updateTaskDto.status}"`);
+
+    this.notificationService.sendSMS(user.phone, this._getSMSMessage(task, updateTaskDto.status));
 
     return task;
   }
