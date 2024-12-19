@@ -9,7 +9,7 @@ export class TasksService {
 
   constructor(
     private readonly usersService: UsersService,
-    private readonly notificationService: NotificationService
+    private readonly notificationService: NotificationService,
   ) {}
 
   async createTask(createTaskDto: CreateTaskDto) {
